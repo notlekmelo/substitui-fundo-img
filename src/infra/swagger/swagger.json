@@ -1,0 +1,108 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Documentação Swagger do prjeto de assinaturas",
+        "version": "1.0.0",
+        "title": "assinaturas",
+        "contact": {
+            "email": "keltonmof@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "schemes": [
+        "http"
+    ],
+    "host": "189.48.177.66:3000",
+    "basePath": "/",
+    "paths": {
+        "/substituir-fundo": {
+            "post": {
+                "summary": "Substitui o fundo da imagem enviada",
+                "tags": ["Usuários"],
+                "description": "Utiliza I.A para remover o fundo da imagem e substituir por outra",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto Resposta",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/postAssinaturaPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resposta criada",
+                        "schema": {
+                            "$ref": "#/definitions/postAssinaturaResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Parâmetro inválido",
+                        "schema": {
+                            "$ref": "#/definitions/InvalidResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro no servidor de banco de dados",
+                        "schema": {
+                            "$ref": "#/definitions/InvalidResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "InvalidResponse": {
+            "type": "object",
+            "properties": {
+                "statusCode": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "postAssinaturaPayload": {
+            "type": "object",
+            "required": ["ImagemOriginal"],
+            "properties": {
+                "Caminho": {
+                    "type": "string",
+                    "description": "Caminho que as imagens serão salvas"
+                },
+                "ImagemOriginal": {
+                    "type": "string",
+                    "description": "Imagem em base64 que terá o fundo substituído"
+                },
+                "ImagemFundo": {
+                    "type": "string",
+                    "description": "Caminho (iniciado com C:/) ou base 64 da imagem que será o novo fundo"
+                }
+            }
+        },
+        "postAssinaturaResponse": {
+            "type": "object",
+            "properties": {
+                "statusCode": {
+                    "type": "integer"
+                },
+                "nomeImagem": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

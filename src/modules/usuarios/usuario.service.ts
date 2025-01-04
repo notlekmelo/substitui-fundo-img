@@ -3,13 +3,12 @@ import fs from "fs";
 import path from "path";
 import { Usuario } from "./usuario";
 import { Rembg } from 'rembg';
-import sharp from "sharp";
-import { v4 as uuidv4 } from 'uuid';
+import sharp, { gravity } from "sharp";
 
 export const gravarAssinatura = async (usuario: Usuario, callback: Function) => {
     dotenv.config();
 
-    let novoFundo;
+    let novoFundo: Buffer;
     const caminhoPrincipal = usuario.Caminho || String(process.env.DIRETORIO_BASE);
     
     // Verifica se o diretório existe e se não existir cria
@@ -18,30 +17,20 @@ export const gravarAssinatura = async (usuario: Usuario, callback: Function) => 
     }
 
     // Verifica se a imagem de fundo está definida
-    if (usuario.ImagemFundo) {
-        if (usuario.ImagemFundo.startsWith('C:/')) {
-            if (!fs.existsSync(usuario.ImagemFundo)) {
-                return callback({ message: "O caminho da imagem de fundo não foi encontrado" });
-            } else {
-                novoFundo = fs.readFileSync(usuario.ImagemFundo);
-            }
-        } else {
-            novoFundo = Buffer.from(usuario.ImagemFundo, "base64");
-        }
-    } else {
-        if (!fs.existsSync(path.join(caminhoPrincipal, String(process.env.IMAGEM_FUNDO)))) {
-            return callback({ message: "O caminho da imagem de fundo não foi encontrado" });
-        }
-        novoFundo = fs.readFileSync(path.join(caminhoPrincipal, String(process.env.IMAGEM_FUNDO)));
+    if (!fs.existsSync(path.join(caminhoPrincipal, String(process.env.IMAGEM_FUNDO)))) {
+        return callback({ message: "O caminho da imagem de fundo não foi encontrado" });
     }
+    novoFundo = fs.readFileSync(path.join(caminhoPrincipal, String(process.env.IMAGEM_FUNDO)));
 
     try {
-        const caminhoImagem = path.join(caminhoPrincipal, String(process.env.DIRETORIO_ANEXOS), uuidv4() + '.png');
+        const caminhoImagem = path.join(caminhoPrincipal, String(process.env.DIRETORIO_ANEXOS), 'NovaImagem.png');
         
         // Verifica a imagem original
         if (!usuario.ImagemOriginal) {
             return callback({ message: "Imagem original não fornecida" });
         }
+
+        sharp.cache(false);
 
         const sharpImage = sharp(Buffer.from(usuario.ImagemOriginal, 'base64'));
 
@@ -63,18 +52,34 @@ export const gravarAssinatura = async (usuario: Usuario, callback: Function) => 
 
         // Se a imagem sem fundo foi gravada com sucesso
         if (gravaIMG) {
-            const novoNome = path.join(caminhoPrincipal, String(process.env.DIRETORIO_ANEXOS), uuidv4() + '.png');
-            sharp(novoFundo)
-                .composite([{ input: caminhoImagem, gravity: "center" }]) // Substitui o fundo
-                .toFile(path.join(novoNome), (err, info) => {
-                    if (err) {
-                        return callback(err, '', caminhoImagem);
-                    } else {
-                        console.log("Imagem processada!");
-                        return callback(null, novoNome, caminhoImagem);
-                    }
-                });
-        }
+            sharp(caminhoImagem).resize({
+                width: 168,
+                height: 168,
+                fit: 'inside', // Mantém as proporções e garante que a imagem caiba dentro das dimensões
+              }).toBuffer()
+              .then((resizedBuffer) => {
+                const composites = [];
+                for (let x = 0; x < 4; x++) {
+                    composites.push({
+                    input: resizedBuffer,
+                    gravity: 'center',
+                    top: 0,
+                    left: x * 168,
+                    });
+                }
+                const novoNome = path.join(caminhoPrincipal, String(process.env.DIRETORIO_ANEXOS), 'FundoSubstituido.png');
+                sharp(novoFundo)
+                    .composite(composites) // Substitui o fundo
+                    .toFile(path.join(novoNome), (err, info) => {
+                        if (err) {
+                            return callback(err, '', caminhoImagem);
+                        } else {
+                            console.log("Imagem processada!");
+                            return callback(null, novoNome, caminhoImagem);
+                        }
+                    });
+        })
+    }
     } catch (err) {
         callback(err);
     }

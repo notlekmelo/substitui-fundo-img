@@ -12,9 +12,6 @@ export const validatorSubstituirFundo = (usuario: Usuario, callback: Function) =
         if (typeof usuario.ImagemOriginal != 'string' || !fs.existsSync(usuario.Caminho)) {
             callback(false, 'O caminho para salvar a nova imagem é inválido');
         }
-    } 
-    if (usuario.ImagemFundo && typeof usuario.ImagemFundo != 'string') {
-        callback(false, 'O parâmetro imagem de fundo é inválido.');
     }
     else {
         callback(true, '');

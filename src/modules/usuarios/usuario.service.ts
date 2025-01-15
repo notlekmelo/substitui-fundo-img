@@ -68,11 +68,16 @@ export const gravarAssinatura = async (
 
     // Se a imagem sem fundo foi gravada com sucesso
     if (gravaIMG) {
+      const medidas = await sharp(caminhoImagem).metadata();
       sharp(caminhoImagem)
         .resize({
-          width: 168,
+          width: Math.ceil((medidas.width || 1280) * 0.232),
           height: 168,
-          fit: "inside", // Mantém as proporções e garante que a imagem caiba dentro das dimensões
+          fit: "fill",
+          position: "left",
+          // width: 168,
+          // height: 168,
+          // fit: "inside",
         })
         .toBuffer()
         .then((resizedBuffer) => {
@@ -80,9 +85,13 @@ export const gravarAssinatura = async (
           for (let x = 0; x < 4; x++) {
             composites.push({
               input: resizedBuffer,
-              gravity: "center",
-              top: 40,
-              left: x * 168,
+              top: 0,
+              gravity: "east",
+              left: x * 168 - Math.ceil((medidas.width || 1280) * 0.049),
+              // input: resizedBuffer,
+              // gravity: "center",
+              // top: 40,
+              // left: x * 168,
             });
           }
           const novoNome = path.join(

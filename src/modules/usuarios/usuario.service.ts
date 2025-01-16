@@ -71,13 +71,10 @@ export const gravarAssinatura = async (
       const medidas = await sharp(caminhoImagem).metadata();
       sharp(caminhoImagem)
         .resize({
-          width: Math.ceil((medidas.width || 1280) * 0.232),
+          width: 168,
           height: 168,
           fit: "fill",
           position: "left",
-          // width: 168,
-          // height: 168,
-          // fit: "inside",
         })
         .toBuffer()
         .then((resizedBuffer) => {
@@ -87,11 +84,7 @@ export const gravarAssinatura = async (
               input: resizedBuffer,
               top: 0,
               gravity: "east",
-              left: x * 168 - Math.ceil((medidas.width || 1280) * 0.049),
-              // input: resizedBuffer,
-              // gravity: "center",
-              // top: 40,
-              // left: x * 168,
+              left: x * 168,
             });
           }
           const novoNome = path.join(

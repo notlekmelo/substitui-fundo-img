@@ -68,7 +68,6 @@ export const gravarAssinatura = async (
 
     // Se a imagem sem fundo foi gravada com sucesso
     if (gravaIMG) {
-      const medidas = await sharp(caminhoImagem).metadata();
       sharp(caminhoImagem)
         .resize({
           width: 168,
@@ -90,8 +89,32 @@ export const gravarAssinatura = async (
           const novoNome = path.join(
             caminhoPrincipal,
             String(process.env.DIRETORIO_ANEXOS),
-            "FundoSubstituido.png"
+            "foto1.png"
           );
+          for (let i = 5; i > 0; i--) {
+            if (
+              fs.existsSync(
+                path.join(
+                  caminhoPrincipal,
+                  String(process.env.DIRETORIO_ANEXOS),
+                  `foto${i}.png`
+                )
+              )
+            ) {
+              fs.renameSync(
+                path.join(
+                  caminhoPrincipal,
+                  String(process.env.DIRETORIO_ANEXOS),
+                  `foto${i}.png`
+                ),
+                path.join(
+                  caminhoPrincipal,
+                  String(process.env.DIRETORIO_ANEXOS),
+                  `foto${i + 1}.png`
+                )
+              );
+            }
+          }
           sharp(novoFundo)
             .composite(composites) // Substitui o fundo
             .toFile(path.join(novoNome), (err, info) => {

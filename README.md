@@ -5,7 +5,7 @@ Para execução do projeto é necessário
 
 Download do modelo de I.A utilizado
 
-https://objects.githubusercontent.com/github-production-release-asset-2e65be/286500101/e39324e8-fce7-44ee-ae2f-12c49df29c51?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20241221%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20241221T182301Z&X-Amz-Expires=300&X-Amz-Signature=6b979862b01ed9361859d8509587908851c59d9b099fc8ab1c2a3004f564057a&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Du2net.onnx&response-content-type=application%2Foctet-stream
+u2net.onnx
 ```
 Abrir o menu Windows e procurar por Executar. 
 
